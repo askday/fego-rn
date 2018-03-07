@@ -12,6 +12,7 @@ export default class GesturePasswordDemo extends Component {
   constructor(props) {
     super(props);
     // 初始状态
+    const { state } = this.props.navigation;
     this.state = {
       isWarning: false,
       message: 'Verify your gesture password',
@@ -19,61 +20,13 @@ export default class GesturePasswordDemo extends Component {
       password: '',
       // thumbnails: [],
       statusBarHeight: 0,
-      navigationHeight: 0,
+      navigationHeight: state ? 44 : 0,
     };
     this._cachedPassword = '';
-  }
-  componentWillMount() {
-    // 判断屏幕的状态栏和导航栏是否存在，以便计算高度
-    const {
-      state,
-    } = this.props.navigation;
-    this.state.navigationHeight = state ? 44 : 0;
   }
 
   componentDidMount() {
     this._cachedPassword = '13457'; // get cached gesture password
-  }
-
-  render() {
-    return (
-      <View style={
-        {
-          position: 'absolute',
-          top: -this.state.statusBarHeight - this.state.navigationHeight,
-        }
-      }
-      >
-      <GesturePassword
-        style={
-          {
-            paddingTop: 20 + 44,
-          }
-        }
-        isWarning={
-        this.state.isWarning
-      }
-        warningDuration={
-        1500
-      }
-        topComponent={
-        this._renderDescription()
-      }
-        bottomComponent={
-        this._renderActions()
-      }
-        onFinish={
-        this._onFinish
-      }
-        onReset={
-        this._onReset
-      }
-        isPointNoChange={
-        false
-      }
-      />
-      </View >
-    );
   }
 
   _renderThumbnails() {
@@ -112,7 +65,7 @@ export default class GesturePasswordDemo extends Component {
         }
       }
       >
-      {thumbnails}
+        {thumbnails}
       </View>
     );
   }
@@ -127,8 +80,8 @@ export default class GesturePasswordDemo extends Component {
       }
     }
     >
-    {this._renderThumbnails()}
-    <Text style={
+      {this._renderThumbnails()}
+      <Text style={
         {
           fontFamily: '.HelveticaNeueInterface-MediumP4',
           fontSize: 14,
@@ -136,9 +89,9 @@ export default class GesturePasswordDemo extends Component {
           color: this.state.messageColor,
         }
       }
-    >
-    {this.state.message}
-    </Text>
+      >
+        {this.state.message}
+      </Text>
     </View >
   )
 
@@ -154,7 +107,7 @@ export default class GesturePasswordDemo extends Component {
       }
     }
     >
-    {
+      {
         /* <Button
                             style={{ margin: 10, height: 40, justifyContent: 'center', }}
                             textStyle={{fontSize: 14, color: '#A9A9A9'}}>
@@ -210,5 +163,26 @@ export default class GesturePasswordDemo extends Component {
       });
     }
     Alert.alert(`password is ${password}`);
+  }
+
+  render() {
+    return (
+      <View style={{
+          position: 'absolute',
+          top: -this.state.statusBarHeight - this.state.navigationHeight,
+        }}
+      >
+        <GesturePassword
+          style={{ paddingTop: 20 + 44 }}
+          isWarning={this.state.isWarning}
+          warningDuration={1500}
+          topComponent={this._renderDescription()}
+          bottomComponent={this._renderActions()}
+          onFinish={this._onFinish}
+          onReset={this._onReset}
+          isPointNoChange={false}
+        />
+      </View >
+    );
   }
 }

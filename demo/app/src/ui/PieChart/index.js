@@ -8,14 +8,11 @@ export default class PieChartView extends Component {
     super(props);
     this.state = {
       show: 'none',
-      percentArray: [0.1, 0.1, 0.7, 0.1],
     };
   }
 
   componentDidMount() {
-    this.setState({
-      percentArray: [0.2, 0.1, 0.4, 0.3],
-    });
+
   }
   _showTips = () => {
     this.setState({
@@ -34,29 +31,29 @@ export default class PieChartView extends Component {
             <Text
               position="absolute"
               style={{
-              display: this.state.show, top: 40, left: 130, zIndex: 10, backgroundColor: 'transparent',
-            }}
+                display: this.state.show, top: 40, left: 130, zIndex: 10, backgroundColor: 'transparent',
+              }}
             >20%
             </Text>
             <Text
               position="absolute"
               style={{
-              display: this.state.show, top: 60, left: 150, zIndex: 10, backgroundColor: 'transparent',
-            }}
+                display: this.state.show, top: 60, left: 150, zIndex: 10, backgroundColor: 'transparent',
+              }}
             >10%
             </Text>
             <Text
               position="absolute"
               style={{
-              display: this.state.show, top: 95, left: 90, zIndex: 10, backgroundColor: 'transparent',
-            }}
+                display: this.state.show, top: 95, left: 90, zIndex: 10, backgroundColor: 'transparent',
+              }}
             >40%
             </Text>
             <Text
               position="absolute"
               style={{
-              display: this.state.show, top: 0, left: 40, zIndex: 10, backgroundColor: 'transparent',
-            }}
+                display: this.state.show, top: 0, left: 40, zIndex: 10, backgroundColor: 'transparent',
+              }}
             >30%
             </Text>
             <View position="absolute" style={{ top: 60, left: 60 }}>
@@ -110,7 +107,7 @@ export default class PieChartView extends Component {
             duration={1500}
             animationType="sequence"
             rotation={90}
-            configArray={[{ stroke: 'red', strokeWidth: 1, strokeDash: [2, 5] }, { stroke: 'black', strokeWidth: 1, strokeDash: [2, 5] }, ,]}
+            configArray={[{ stroke: 'red', strokeWidth: 1, strokeDash: [2, 5] }, { stroke: 'black', strokeWidth: 1, strokeDash: [2, 5] }, null, null]}
           />
         </Item>
         <Item>
@@ -123,7 +120,7 @@ export default class PieChartView extends Component {
             duration={1500}
             animationType="synchron"
             animationEndCallBack={() => { console.log('同步animationEndCallBack'); }}
-            configArray={[, { stroke: 'red', strokeWidth: 1, strokeDash: [2, 5] }, , { stroke: 'black', strokeWidth: 1, strokeDash: [2, 5] }]}
+            configArray={[null, { stroke: 'red', strokeWidth: 1, strokeDash: [2, 5] }, null, { stroke: 'black', strokeWidth: 1, strokeDash: [2, 5] }]}
           />
         </Item>
       </ScrollView>

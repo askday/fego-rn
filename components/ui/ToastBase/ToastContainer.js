@@ -20,7 +20,11 @@ export default class ToastConatiner extends UIComponent {
   anim = '';
   static propTypes = {
     // Toast内容
-    content: PropTypes.any,
+    content: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.node,
+      PropTypes.element,
+    ]),
     // 延时
     duration: PropTypes.number,
     // 关闭回调
@@ -34,7 +38,7 @@ export default class ToastConatiner extends UIComponent {
     // 图标字体
     iconFamily: PropTypes.string,
     // 图标类型对象
-    iconTypes: PropTypes.object,
+    iconTypes: PropTypes.objectOf(PropTypes.string),
     // Y轴偏移量
     offsetY: PropTypes.number,
     // 动画结束
@@ -134,7 +138,7 @@ export default class ToastConatiner extends UIComponent {
     if (typeof contentDom === 'string') {
       contentDom = (
         <Text style={style.text}>
-        {contentDom}
+          {contentDom}
         </Text>
       );
     }
@@ -148,10 +152,10 @@ export default class ToastConatiner extends UIComponent {
       }
         pointerEvents={modal ? 'auto' : 'box-none'}
       >
-      <View style={[iconDom ? style.innerWithIcon : {}, style.inner]}>
-            {iconDom }
-            {contentDom}
-      </View>
+        <View style={[iconDom ? style.innerWithIcon : {}, style.inner]}>
+          {iconDom }
+          {contentDom}
+        </View>
       </Animated.View >
     );
   }

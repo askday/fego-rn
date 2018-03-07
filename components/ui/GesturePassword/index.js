@@ -164,12 +164,12 @@ _renderArrows() {
   const {
     style,
   } = this;
-  return this.state.arrows.map((arrow, index) => {
+  return this.state.arrows.map((arrow) => {
     if (this.state.isWarning) {
       arrow.color = style.warning.color;
     }
     return (<Arrow
-      key={`arrow-${index}`}
+      key={arrow.id}
       width={
         this._pointRadius / 3
       }
@@ -193,8 +193,8 @@ _renderPoints() {
   const {
     style,
   } = this;
-  return this.state.points.map((point, index) => (<Point
-    key={`point-${index}`}
+  return this.state.points.map(point => (<Point
+    key={point.index}
     radius={this._pointRadius}
     borderWidth={borderWidth}
     backgroundColor={
@@ -261,10 +261,11 @@ _renderLineDetail(line, index) {
 _renderLines() {
   const lines = this.state.lines.map((line, index) => this._renderLineDetail(line, index));
   const segMentLines = this.state.segMentLines.map((line, index) => this._renderLineDetail(line, index));
-  return (<View style={{ flex: 1 }}>
-            {lines}
-            {segMentLines}
-          </View>
+  return (
+    <View style={{ flex: 1 }}>
+      {lines}
+      {segMentLines}
+    </View>
   );
 }
 
@@ -315,10 +316,11 @@ _addSequence(index) {
 }
 
 _addArrow(arrow) {
-  this.state.arrows.push(arrow);
+  // this.state.arrows.push(arrow);
   const { arrows } = this.state;
   this.setState({
-    arrows,
+    // arrows: arrows.slice().push(arrow),
+    arrows: arrows.concat(arrow),
   });
 }
 
@@ -342,10 +344,10 @@ _addLine(line) {
       };
     }
   }
-  this.state.lines.push(line);
+  // this.state.lines.push(line);
   const { lines } = this.state;
   this.setState({
-    lines,
+    lines: lines.concat(line),
   });
 }
 
@@ -428,6 +430,9 @@ _updateLine(
   this.setState({
     segMentLines: [],
   });
+
+  const { lines } = this.state;
+
   if (this.props.isHideLine) {
     let dy = end.y - start.y;
     let dx = end.x - start.x;
@@ -454,7 +459,7 @@ _updateLine(
         if (segLines.length > 0) {
           if (!endPointHasActive) {
             for (let m = 0; m < segLines.length; m += 1) {
-              this.state.lines.push(segLines[m]);
+              lines.push(segLines[m]);
             }
           }
           this.setState({
@@ -479,7 +484,6 @@ _updateLine(
   }
 
   // 更新线条
-  const { lines } = this.state;
   this.setState({
     lines,
   });
@@ -565,6 +569,7 @@ _onTouchMove = (e) => {
       start: point.origin,
       end: location,
       color: style.line.color || style.active.color,
+      id: `line-${point.origin.x}-${point.origin.y}-${location.x}-${location.y}`,
     };
     this._addLine(line);
     this._currentLine = line;
@@ -610,6 +615,7 @@ _onTouchMove = (e) => {
       start: this._currentPoint.origin,
       end: point.origin,
       color: style.active.color,
+      id: `arrow-${this._currentPoint.origin.x}-${this._currentPoint.origin.y}-${point.origin.x}-${point.origin.y}`,
     };
     this._addArrow(arrow);
     // 以及添加一条新线
@@ -618,6 +624,7 @@ _onTouchMove = (e) => {
       start: point.origin,
       end: location,
       color: style.line.color || style.active.color,
+      id: `line-${point.origin.x}-${point.origin.y}-${location.x}-${location.y}`,
     };
     this._addLine(line);
     this._currentLine = line;

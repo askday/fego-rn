@@ -46,7 +46,7 @@ export default class PopMenu extends UIComponent {
     // PopMenu 标题
     title: PropTypes.node,
     // PopMenu 的内容
-    content: PropTypes.array,
+    content: PropTypes.arrayOf(PropTypes.any),
     // 控制PopMenu的三角形是否显示
     showTriangle: PropTypes.bool,
     // 三角形的高
@@ -413,7 +413,7 @@ export default class PopMenu extends UIComponent {
           scale={false}
           visible={visible}
           maskClosable={maskClosable}
-          animateAppear={false}
+          animateWhenMount={false}
           animationDuration={animateTime}
           onClose={this._onHidePopMenu}
           // ios 端能把这个样式下放到 _renderOverlay 方法返回的顶层元素上，但是 android 端不行，下放后整个PopMenu 的 overlay 都不会显示
