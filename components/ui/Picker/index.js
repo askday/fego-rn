@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import UIComponent from '../../common/UIComponent';
+import { UIComponent } from 'common';
 import AnimateModal from '../AnimateModal';
 import PickerView from './PickerView';
 import DatePicker from './DatePicker';
@@ -157,13 +157,13 @@ class Picker extends UIComponent {
               onReady={this._onPickerViewReady}
             />
           ) : (
-            <DatePicker
-              dataPickRef={(el) => { this._pickerView = el; }}
-              {...this.props}
-              mode={this.props.datePickerMode}
-              initialValue={this.props.defaultDateValue}
-              onChange={this._onChange}
-            />
+              <DatePicker
+                dataPickRef={(el) => { this._pickerView = el; }}
+                {...this.props}
+                mode={this.props.datePickerMode}
+                initialValue={this.props.defaultDateValue}
+                onChange={this._onChange}
+              />
             )}
 
         {/* footer */}

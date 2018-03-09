@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import AnimateModal from '../AnimateModal';
 import { tip, alert, confirm } from './tip';
-import UIComponent from '../../common/UIComponent';
+import { UIComponent } from 'common';
 
 const { maxHeight } = StyleSheet.create({
   maxHeight: {

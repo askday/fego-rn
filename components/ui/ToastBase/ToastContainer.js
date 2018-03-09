@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { View, Text, ActivityIndicator, Animated } from 'react-native';
 import Icon from '../Icon';
-import UIComponent from '../../common/UIComponent';
+import { UIComponent } from 'common';
 
 export default class ToastConatiner extends UIComponent {
   static defaultProps = {
@@ -145,15 +145,15 @@ export default class ToastConatiner extends UIComponent {
     return (
       <Animated.View
         style={
-        [style.container, mask ? style.mask : null, {
-          top: offsetY,
-          opacity: this.state.fadeAnim,
-        }]
-      }
+          [style.container, mask ? style.mask : null, {
+            top: offsetY,
+            opacity: this.state.fadeAnim,
+          }]
+        }
         pointerEvents={modal ? 'auto' : 'box-none'}
       >
         <View style={[iconDom ? style.innerWithIcon : {}, style.inner]}>
-          {iconDom }
+          {iconDom}
           {contentDom}
         </View>
       </Animated.View >

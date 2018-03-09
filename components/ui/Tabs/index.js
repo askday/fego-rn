@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import TabBar from './TabBar';
 import TabPane from './TabPane';
-import UIComponent from '../../common/UIComponent';
+import { UIComponent } from 'common';
 import SceneComponent from './SceneComponent';
 
 
