@@ -12,12 +12,13 @@ import {
   Dimensions,
   View,
 } from 'react-native';
+import { UIComponent } from 'common';
 
 import * as Utils from './Utils';
 import Point from './Point';
 import Line from './Line';
 import Arrow from './Arrow';
-import { UIComponent } from 'common';
+
 
 const padding = 8;
 const borderWidth = 1;

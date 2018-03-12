@@ -2,7 +2,7 @@
  * 图标组件
  * @author esky Henry
  */
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Text } from 'react-native';
 
@@ -23,7 +23,7 @@ const baseStyle = {
  * }
  */
 let FAMILY_MAP = {};
-export default class Icon extends Component {
+export default class Icon extends PureComponent {
   /**
    * 产品项目可设置默认字体
    * Icon.defaultProps.family = 'self'
@@ -32,12 +32,11 @@ export default class Icon extends Component {
     // 默认字体为FontAwesome
     // http://www.fontawesome.com.cn/faicons/
     family: 'FontAwesome',
-    size: 16,
-    color: '#333',
   }
   static propTypes = {
     ...Text.propTypes,
     name: PropTypes.string.isRequired,
+    /* eslint react/require-default-props: "off" */
     size: PropTypes.number,
     color: PropTypes.string,
     // 字体库名称
@@ -62,6 +61,11 @@ export default class Icon extends Component {
     const simpleStyle = {};
     if (typeof glyph === 'number') {
       glyph = String.fromCharCode(glyph);
+    } else if (typeof glyph === 'string') {
+      glyph = glyph.replace('/', '');
+      glyph = glyph.replace('&#x', '');
+      glyph = glyph.replace(';', '');
+      glyph = String.fromCharCode(parseInt(glyph, 16));
     }
     if (typeof size === 'number') {
       simpleStyle.fontSize = size;
@@ -69,7 +73,7 @@ export default class Icon extends Component {
     if (typeof color === 'string') {
       simpleStyle.color = color;
     }
-    // 样式优先级 baseStyle style simpleStyle
+    // 样式优先级 baseStyle < style < simpleStyle
     props.style = [baseStyle.container, style, simpleStyle, { fontFamily: family }];
     return <Text {...props}>{glyph}</Text>;
   }

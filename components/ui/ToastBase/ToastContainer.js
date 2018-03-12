@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View, Text, ActivityIndicator, Animated } from 'react-native';
-import Icon from '../Icon';
 import { UIComponent } from 'common';
+
+import Icon from '../Icon';
 
 export default class ToastConatiner extends UIComponent {
   static defaultProps = {
