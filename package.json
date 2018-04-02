@@ -1,6 +1,6 @@
 {
   "name": "fego-rn-study",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "基于 React Native 的移动开发库",
   "author": "askday",
   "main": "components/index.js",

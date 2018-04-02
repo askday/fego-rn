@@ -469,8 +469,7 @@ export default class Carousel extends UIComponent {
    * 通过偏移量计算当前页
    */
   _calculateCurrentPage = (offset) => {
-    const { direction, size } = this.props;
-    const { curPage, startPage } = this.state;
+    const { curPage } = this.state;
     let newCurPage = curPage;
     if (this._beginOffset > offset) {
       newCurPage -= 1;
