@@ -248,17 +248,24 @@ export default class TabBar extends UIComponent {
       itemWidth,
     } = this.state;
 
+    let mh = 0;
+    activeUnderlineStyle.forEach((element) => {
+      if (element.marginHorizontal) mh = element.marginHorizontal;
+    });
     const contentView = (
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
         {items.map(item => this._renderTabItem(item, activeIdx))}
-        {showUnderline ? <Animated.View style={
-          [{
-            width: itemWidth,
-            left: this.state.left,
-          }, tabStyle.underline, activeUnderlineStyle]}
-        /> : null}
+        {
+          showUnderline ? <Animated.View style={
+            [{
+              width: itemWidth - mh * 2,
+              left: this.state.left,
+            }, tabStyle.underline, activeUnderlineStyle]}
+          /> : null
+        }
       </View>
     );
+
     return (
       <View
         style={[{ width: barWidth }, this.style.container]}

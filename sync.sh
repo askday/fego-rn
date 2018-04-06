@@ -1,4 +1,4 @@
-src=/Users/wangxiang/WorkSpace/fego/fego-rn/
+src=$HOME/WorkSpace/fego-rn/
 dest=`pwd`
 # cp -rf $src/components $dest
 # cp -rf $src/demo/ $dest/demo
