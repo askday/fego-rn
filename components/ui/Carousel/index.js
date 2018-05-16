@@ -138,10 +138,12 @@ export default class Carousel extends UIComponent {
 
   componentWillReceiveProps(nextProps) {
     super.componentWillReceiveProps(nextProps);
-    this._updateChildrenCount(nextProps);
-    this._updateActualLoadPageCount(nextProps);
-    this._updateLoadPageRegion(nextProps, this.state.curPage);
-    this._setTimerIfNeed(nextProps, this.state.curPage);
+    if (this._shouldUpdateLoadPageRegion(this.props, nextProps)) {
+      this._updateChildrenCount(nextProps);
+      this._updateActualLoadPageCount(nextProps);
+      this._updateLoadPageRegion(nextProps, this.state.curPage);
+      this._setTimerIfNeed(nextProps, this.state.curPage);
+    }
   }
 
   componentWillUnmount() {
@@ -211,8 +213,12 @@ export default class Carousel extends UIComponent {
     let childrenCount;
     if (childrenType === 'image') {
       childrenCount = source.length;
-    } else {
+    } else if (Array.isArray(children)) {
       childrenCount = children.length;
+    } else if (React.isValidElement(children)) {
+      childrenCount = 1;
+    } else {
+      childrenCount = 0;
     }
     return childrenCount;
   }
@@ -283,45 +289,43 @@ export default class Carousel extends UIComponent {
     if (actualLoadPageCount === 1) {
       startPage = 0;
       endPage = 0;
-    } else {
-      if (mode === 'all') {
-        if (infinite) {
-          startPage = -1;
-          endPage = actualLoadPageCount - 2;
+    } else if (mode === 'all') {
+      if (infinite) {
+        startPage = -1;
+        endPage = actualLoadPageCount - 2;
+      } else {
+        startPage = 0;
+        endPage = actualLoadPageCount - 1;
+      }
+    } else if (mode === 'preload') {
+      const halfCount = Math.floor(actualLoadPageCount / 2);
+      if (infinite) {
+        startPage = curPage - halfCount;
+        endPage = startPage + actualLoadPageCount - 1;
+      } else if (actualLoadPageCount === childrenCount) {
+        startPage = 0;
+        endPage = actualLoadPageCount - 1;
+      } else if (curPage - halfCount > 0) {
+        if (curPage + halfCount >= childrenCount - 1) {
+          endPage = childrenCount - 1;
+          startPage = endPage - actualLoadPageCount + 1;
         } else {
-          startPage = 0;
-          endPage = actualLoadPageCount - 1;
-        }
-      } else if (mode === 'preload') {
-        const halfCount = Math.floor(actualLoadPageCount / 2);
-        if (infinite) {
           startPage = curPage - halfCount;
-          endPage = startPage + actualLoadPageCount - 1;
-        } else if (actualLoadPageCount === childrenCount) {
-          startPage = 0;
-          endPage = actualLoadPageCount - 1;
-        } else if (curPage - halfCount > 0) {
-          if (curPage + halfCount >= childrenCount - 1) {
-            endPage = childrenCount - 1;
-            startPage = endPage - actualLoadPageCount + 1;
-          } else {
-            startPage = curPage - halfCount;
-            endPage = startPage + actualLoadPageCount - 1;
-          }
-        } else {
-          startPage = 0;
           endPage = startPage + actualLoadPageCount - 1;
         }
       } else {
-        console.warn(`不支持的mode:${mode}`);
+        startPage = 0;
+        endPage = startPage + actualLoadPageCount - 1;
       }
-      this.setState({
-        startPage,
-        endPage,
-      }, () => {
-        this._placeCritical(curPage, startPage);
-      });
+    } else {
+      console.warn(`不支持的mode:${mode}`);
     }
+    this.setState({
+      startPage,
+      endPage,
+    }, () => {
+      this._placeCritical(curPage, startPage);
+    });
     this._hasUpdatedDisplayRegion = true;
   }
 
@@ -343,10 +347,30 @@ export default class Carousel extends UIComponent {
     });
   }
 
-  _updateDisplay = () => {
+  _updateDisplay = (event) => {
     if (Platform.OS === 'ios' && this.props.mode === 'preload') {
       this._updateLoadPageRegion(this.props, this._targetPage);
       this._updateCurPage(this._targetPage);
+    }
+
+    if (this.props.mode === 'all') {
+      const { direction } = this.props;
+      const { startPage, endPage, curPage } = this.state;
+      const { contentOffset } = event.nativeEvent;
+
+      const offset = direction === 'horizontal' ? contentOffset.x : contentOffset.y;
+      let newCurPage = offset / windowWidth;
+      newCurPage -= 1;
+      const fixedPage = this._getFixedPageIdx(newCurPage);
+      if (newCurPage === startPage || newCurPage === endPage) {
+        this._changeToPage(fixedPage, false);
+        this._setTimerIfNeed(this.props, fixedPage);
+      } else {
+        if (fixedPage !== curPage) {
+          this._updateCurPage(fixedPage);
+        }
+        this._setTimerIfNeed(this.props, curPage);
+      }
     }
   }
 
@@ -473,27 +497,20 @@ export default class Carousel extends UIComponent {
   }
 
   /**
-   * 通过偏移量计算当前页
-   */
-  _calculateCurrentPage = (offset) => {
-    const { curPage } = this.state;
-    let newCurPage = curPage;
-    if (this._beginOffset > offset && this._beginOffset - offset > windowWidth / 3) {
-      newCurPage -= 1;
-    } else if (this._beginOffset < offset && offset - this._beginOffset > windowWidth / 3) {
-      newCurPage += 1;
-    }
-    return newCurPage;
-  }
-
-  /**
    * scrollview滚动控制模块
    *
    * @memberof Carousel
    */
   _scrollTo = (offsetX, offsetY, animated) => {
+    console.log(':scrollview:' + offsetX + "|" + animated);
     if (this.scrollView) {
-      this.scrollView.scrollTo({ y: offsetY, x: offsetX, animated });
+      if (Platform.OS === 'android') {
+        setTimeout(() => {
+          this.scrollView.scrollTo({ y: offsetY, x: offsetX, animated });
+        }, 100);
+      } else {
+        this.scrollView.scrollTo({ y: offsetY, x: offsetX, animated });
+      }
     }
   }
 
@@ -541,32 +558,34 @@ export default class Carousel extends UIComponent {
   }
 
   _onScrollEndDrag = (event) => {
-    const { direction, infinite } = this.props;
-    const { curPage } = this.state;
-    const { contentOffset } = event.nativeEvent;
-    let newCurPage = curPage;
-    if (event.nativeEvent) {
-      const { velocity } = event.nativeEvent;
-      const { x: vX } = velocity;
-      if (Math.abs(vX) > 0.1) {
-        if (vX > 0) {
-          newCurPage = curPage + 1;
-        } else {
-          newCurPage = curPage - 1;
-        }
-      } else {
-        const offset = direction === 'horizontal' ? contentOffset.x : contentOffset.y;
-        newCurPage = this._calculateCurrentPage(offset);
-      }
-    }
-    if (!infinite &&
-      ((curPage === this._childrenCount - 1 && newCurPage > curPage) ||
-        (curPage === 0 && newCurPage < 0))) {
-      return;
-    }
-    const fixedPage = this._getFixedPageIdx(newCurPage);
-    this._setTimerIfNeed(this.props, fixedPage);
-    this._changeToPage(fixedPage, false);
+    // const { direction, infinite } = this.props;
+    // const { curPage } = this.state;
+    // const { contentOffset } = event.nativeEvent;
+    // let newCurPage = curPage;
+    // if (event.nativeEvent) {
+    //   const { velocity } = event.nativeEvent;
+    //   const { x: vX } = velocity;
+    //   if (Math.abs(vX) > 0.1) {
+    //     if (vX > 0) {
+    //       newCurPage = curPage + 1;
+    //     } else {
+    //       newCurPage = curPage - 1;
+    //     }
+    //   } else {
+    //     const offset = direction === 'horizontal' ? contentOffset.x : contentOffset.y;
+    //     newCurPage = this._calculateCurrentPage(offset);
+    //   }
+    // }
+    // if (!infinite &&
+    //   ((curPage === this._childrenCount - 1 && newCurPage > curPage) ||
+    //     (curPage === 0 && newCurPage < 0))) {
+    //   return;
+    // }
+    // const fixedPage = this._getFixedPageIdx(newCurPage);
+    // console.log(`${fixedPage}|${curPage}|${newCurPage}`);
+    // // this._changeToPage(fixedPage, false);
+    // this._updateCurPage(fixedPage);
+    // this._setTimerIfNeed(this.props, fixedPage);
   }
 
   /**
@@ -651,8 +670,10 @@ export default class Carousel extends UIComponent {
               <Image key={key} resizeMode="stretch" source={{ uri: sourceEl, ...size }} />
             );
           }
-        } else {
+        } else if (Array.isArray(children)) {
           page = children[fixedIdx];
+        } else {
+          page = children;
         }
       } else {
         page = (
