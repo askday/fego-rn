@@ -502,7 +502,6 @@ export default class Carousel extends UIComponent {
    * @memberof Carousel
    */
   _scrollTo = (offsetX, offsetY, animated) => {
-    console.log(':scrollview:' + offsetX + "|" + animated);
     if (this.scrollView) {
       if (Platform.OS === 'android') {
         setTimeout(() => {
