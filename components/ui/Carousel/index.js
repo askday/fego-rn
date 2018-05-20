@@ -148,6 +148,7 @@ export default class Carousel extends UIComponent {
 
   componentWillUnmount() {
     this._clearTimer();
+    this._androidTimer && clearTimeout(this._androidTimer);
   }
 
   /**
@@ -504,7 +505,8 @@ export default class Carousel extends UIComponent {
   _scrollTo = (offsetX, offsetY, animated) => {
     if (this.scrollView) {
       if (Platform.OS === 'android') {
-        setTimeout(() => {
+        this._androidTimer && clearTimeout(this._androidTimer);
+        this._androidTimer = setTimeout(() => {
           this.scrollView.scrollTo({ y: offsetY, x: offsetX, animated });
         }, 100);
       } else {
