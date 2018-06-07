@@ -292,8 +292,8 @@ export default class Tabs extends UIComponent {
         this._setCurrentPage(index);
       }
 
-      const { key, title } = this._getItem(index);
-      onChange(key, title);
+      const { _key, title } = this._getItem(index);
+      onChange(_key, title);
     }
   }
 
